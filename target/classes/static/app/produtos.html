@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos</title>
+    <link rel="stylesheet" href="/app/dist/css/estilo.css">
+</head>
+<body>
+    <div class="float" style="padding-left: 10px;">
+        <form style="text-align: right;">
+            <label>ID </label><input type="text" id="tx_id" readonly disabled/><br><br>
+            <label>Produto </label><input type="text" id="tx_nome"/><br><br>
+            <label>Quantidade Estoque </label><input type="number" id="nu_qtdEstoque"/><br><br>
+            <label>Unitário Atual </label><input type="number" id="nu_precoUnidAtual"/><br><br>
+            <label>Ativo </label><input type="checkbox" id="bo_ativo"/><br><br>
+            <button type="button" onclick=limparCampos()>Limpar Campos</button>
+            <button type="button" onclick=listarProdutos()>Listar</button>
+            <button type="button" onclick=criarProduto()>Criar</button>
+            <button type="button" onclick=alterarProduto()>Alterar</button>
+        </form>
+    </div>
+
+    <h1>Produtos</h1>
+
+    <div id="tableProdutos"></div>
+
+    <script>
+        function listarProdutos(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    var json = JSON.parse(this.responseText);
+                    var row  = "";
+                        row +=  "<table border='2'>";
+                        row += "<tr><th>ID</th> <th>Produto</th> <th>Estoque</th> <th>Unitário</th> <th>Ativo</th> <th>Ações</th></tr>";
+                    for(var prod of json){
+                        row += "<tr>";
+                        row += "<td>" + prod.id + "</td> <td>" + prod.descricao + "</td> <td>" + prod.qtdEstoque + "</td> <td>" + prod.precoUnidAtual + "</td> <td>" + prod.ativo + "</td>";
+                        row += "<td> <button style='margin-right: 2px;' type='button' onclick=\"preencherProduto('"+ prod.id + "','" + prod.descricao + "','" + prod.qtdEstoque + "','" + prod.precoUnidAtual + "','" + prod.ativo + "')\">Selecionar</button>";
+                        row += "<button style='margin-right: 2px;' type='button' onclick=excluirProduto('"+ prod.id +"')>Excluir</button>";
+                        row += "</tr>"; // Fim table row                        
+                    }
+                    row += "</table>";// Fim Table
+                    document.getElementById("tableProdutos").innerHTML = row;
+                }
+            };
+            xhttp.open("GET", "/produtos");
+            xhttp.send(); 
+        }
+
+        function preencherProduto(idProduto, txDescProduto, nuQtdEstoque, nuPrecoUnidAtual, boAtivo){
+            document.getElementById("tx_id").value             = idProduto;
+            document.getElementById("tx_nome").value           = txDescProduto;
+            document.getElementById("nu_qtdEstoque").value     = nuQtdEstoque;
+            document.getElementById("nu_precoUnidAtual").value = nuPrecoUnidAtual;
+            document.getElementById("bo_ativo").checked        = boAtivo;
+        }
+
+        function limparCampos(){
+            document.getElementById("tx_id").value             = null;
+            document.getElementById("tx_nome").value           = null;
+            document.getElementById("nu_qtdEstoque").value     = null;
+            document.getElementById("nu_precoUnidAtual").value = null;
+            document.getElementById("bo_ativo").checked        = false;
+        }
+
+        function excluirProduto(idProduto){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Produto excluído!");
+                    return listarProdutos();
+                }
+            }
+            xhttp.open("DELETE", "/produto/" + idProduto);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send();
+        }
+
+        function criarProduto(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Produto criado!");
+                    return listarProdutos();
+                } 
+            }
+            xhttp.open("POST", "/produto");
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(
+                {
+                    id: null,
+                    descricao: document.getElementById("tx_nome").value,
+                    qtdEstoque: document.getElementById("nu_qtdEstoque").value,
+                    precoUnidAtual: document.getElementById("nu_precoUnidAtual").value,
+                    ativo: document.getElementById("bo_ativo").checked
+                }
+            ));
+        }
+
+        function alterarProduto(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Produto Alterado!");
+                    return listarProdutos();
+                }
+            }
+            xhttp.open("PUT", "/produto/" + document.getElementById("tx_id").value);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(
+                {
+                    id: document.getElementById("tx_id").value,
+                    descricao: document.getElementById("tx_nome").value,
+                    qtdEstoque: document.getElementById("nu_qtdEstoque").value,
+                    precoUnidAtual: document.getElementById("nu_precoUnidAtual").value,
+                    ativo: document.getElementById("bo_ativo").checked
+                }
+            ));
+        }
+    </script>
+
+</body>
+</html>

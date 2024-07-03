@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estados</title>
+    <link rel="stylesheet" href="/app/dist/css/estilo.css">
+</head>
+<body>
+    <div class="div" style="padding-left: 10px;">
+        <form style="text-align: right;">
+            <label>ID</label><input type="text" disabled readonly id="tx_id"/>
+            <label>Nome</label><input type="text" id="tx_nome"/>
+            <button type="button" onclick=listarEstados()>Listar</button>
+            <button type="button" onclick=criarEstado()>Criar</button>
+            <button type="button" onclick=alterarEstado()>Alterar</button>
+        </form>
+    </div>
+
+
+
+
+        <h1>Estados</h1>
+        <div id="Listagem"></div>
+
+
+    <script>
+        function criarEstado(){
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Estado criado!");
+                    return listarEstados();
+                } 
+            }
+            xhttp.open("POST", "/estado");
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify({id: null, nome: document.getElementById("tx_nome").value}));
+        }
+
+        function alterarEstado(){
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Estado Alterado!");
+                    return listarEstados();
+                }
+            }
+            xhttp.open("PUT", "/estado/" + document.getElementById("tx_id").value);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify({id: document.getElementById("tx_id").value, nome: document.getElementById("tx_nome").value}));
+        }
+
+        function listarEstados(){
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function(){  
+                if(this.readyState == 4 && this.status == 200){
+                    var json = JSON.parse(this.responseText);
+                    var cont  = "";
+                        cont += "<table border='2'>"
+                        cont += "<tr><th>ID</th> <th>Nome</th> <th>Ações</th></tr> ";
+                    for(var estado of json){
+                        cont += "<tr>";
+                        cont += "<td>"+ estado.id + "</td> <td>"+ estado.nome + "</td>";
+                        cont += "<td>  <button style='margin-right: 2px;' type='button' onclick=\"preencherEstado('" + estado.id + "','" + estado.nome + "')\">Selecionar</button>";
+                        cont += "<button type='button' onclick='excluirEstado(" + estado.id + ")'>Excluir</button></td>";
+                        cont += "</tr>";
+                    }
+                    cont += "</table>";
+                    document.getElementById("Listagem").innerHTML = cont;
+                }
+            };
+            xhttp.open("GET", "/estados");
+            xhttp.send();
+        }
+
+        function preencherEstado(idEstado, nomeEstado){
+            document.getElementById("tx_id").value   = idEstado;
+            document.getElementById("tx_nome").value = nomeEstado;
+        }
+
+        function excluirEstado(idEstado){
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Estado Excluído!");
+                    return listarEstados();
+                }
+            }
+            xhttp.open("DELETE", "/estado/" + idEstado);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send();
+        }
+    </script>
+</body>
+</html>

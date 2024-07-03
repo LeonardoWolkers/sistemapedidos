@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="/app/dist/css/estilo.css">
+</head>
+<body>
+        <div class="float" style="padding-left: 10px;">
+            <form style="text-align: right;">
+                <label>ID </label><input type="text" id="tx_id" readonly disabled/><br><br>
+                <label>Razão Social </label><input type="text" id="tx_nome"/><br><br>
+                <label>ID Municipio </label><input type="text" id="tx_id_munic"/><br><br>
+                <label>CPF </label><input type="text" id="tx_cpf"/><br><br>
+                <label>CNPJ </label><input type="text" id="tx_cpnj"/><br><br>
+                <label>Telefone </label><input type="text" id="tx_telefone"/><br><br>
+                <label>Endereço </label><input type="text" id="tx_endereco"/><br><br>
+                <label>Bairro </label><input type="text" id="tx_bairro"/><br><br>
+                <label>CEP </label><input type="text" id="tx_cep"/><br><br>
+                <label>Email </label><input type="text" id="tx_email"/><br><br>
+                <label>Informações </label><input type="text" id="tx_informacoes"/><br><br>
+                <label>Ativo </label><input type="checkbox" id="bo_ativo"/><br><br>
+                <button type="button" onclick=limparCampos()>Limpar Campos</button>
+                <button type="button" onclick=listarClientes()>Listar</button>
+                <button type="button" onclick=criarCliente()>Criar</button>
+                <button type="button" onclick=alterarCliente()>Alterar</button>
+            </form>
+        </div>
+
+    <h1>Clientes</h1>
+    <div id="Listagem"></div>
+
+    <script>
+        function listarClientes(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    var json = JSON.parse(this.responseText);
+                    var row  = "";
+                        row += "<table border='2'>"; // Inicio table
+                        row += "<tr><th>ID</th> <th>Cliente</th> <th>ID Municipio</th> <th>Municipio</th> <th>CPF</th> <th>CPNJ</th> <th>Telefone</th> <th>Endereço</th> <th>Bairro</th> <th>CEP</th> <th>Email</th> <th>Informações</th> <th>Ativo</th> <th>Ações</th></tr>";
+                    for(var cliente of json){
+                        row += "<tr>"; //Inicio do table row
+                        row += "<td>" + cliente.id + "</td> <td>" + cliente.nomeRazaoSocial + "</td> <td>" + cliente.municipio.id + "</td> <td>" + cliente.municipio.nome + "</td>";
+                        row += "<td>" + cliente.cpf + "</td> <td>" + cliente.cnpj + "</td> <td>" + cliente.telefone + "</td> <td>" + cliente.endereco + "</td>";
+                        row += "<td>" + cliente.bairro + "</td> <td>" + cliente.cep + "</td> <td>" + cliente.email + "</td> <td>" + cliente.informacoes + "</td> <td>" + cliente.ativo + "</td>";
+                        row += "<td> <button style='margin-right: 2px;' type='button' onclick=\"preencherCliente('"+ cliente.id +"','" + cliente.nomeRazaoSocial + "','" + cliente.municipio.id + "','" + cliente.cpf + "','" + cliente.cnpj + "','" + cliente.telefone + "','" + cliente.endereco + "','" + cliente.bairro + "','" + cliente.cep + "','" + cliente.email + "','" + cliente.informacoes + "','" + cliente.ativo +"')\">Selecionar</button>";
+                        row += "<button style='margin-right: 2px;' type='button' onclick=excluirCliente('"+ cliente.id +"')>Excluir</button>";
+                        row += "</tr>"; // Fim table row
+                    }
+                    row += "</table>";// Fim Table
+                    document.getElementById("Listagem").innerHTML = row;
+                }
+            }
+            xhttp.open("GET", "/clientes");
+            xhttp.send();         
+        }
+
+        function preencherCliente(idCliente, txRazaoCliente, idMunic, txCpf, txCnpj, txTelefone, txEndereco, txBairro, txCep, txEmail, txInformacoes, boAtivo){
+            document.getElementById("tx_id").value          = idCliente;
+            document.getElementById("tx_nome").value        = txRazaoCliente;
+            document.getElementById("tx_id_munic").value    = idMunic;
+            document.getElementById("tx_cpf").value         = txCpf;
+            document.getElementById("tx_cpnj").value        = txCnpj;
+            document.getElementById("tx_telefone").value    = txTelefone;
+            document.getElementById("tx_endereco").value    = txEndereco;
+            document.getElementById("tx_bairro").value      = txBairro;
+            document.getElementById("tx_cep").value         = txCep;
+            document.getElementById("tx_email").value       = txEmail;
+            document.getElementById("tx_informacoes").value = txInformacoes;
+            document.getElementById("bo_ativo").checked     = boAtivo;
+        }
+
+        function limparCampos(){
+            document.getElementById("tx_id").value          = null;
+            document.getElementById("tx_nome").value        = null;
+            document.getElementById("tx_id_munic").value    = null;
+            document.getElementById("tx_cpf").value         = null;
+            document.getElementById("tx_cpnj").value        = null;
+            document.getElementById("tx_telefone").value    = null;
+            document.getElementById("tx_endereco").value    = null;
+            document.getElementById("tx_bairro").value      = null;
+            document.getElementById("tx_cep").value         = null;
+            document.getElementById("tx_email").value       = null;
+            document.getElementById("tx_informacoes").value = null;
+            document.getElementById("bo_ativo").checked     = false;
+        }
+
+        function excluirCliente(idCliente){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Cliente excluído!");
+                    return listarClientes();
+                }
+            }
+            xhttp.open("DELETE", "/cliente/" + idCliente);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send();
+        }
+
+        function criarCliente(){
+            var xhttp = new XMLHttpRequest();
+
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Cliente criado!");
+                    return listarClientes();
+                } 
+            }
+            xhttp.open("POST", "/cliente");
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(
+                {
+                    id: null,
+                    municipio: {
+                        id: document.getElementById("tx_id_munic").value,
+                        nome: null,
+                        entrega: null,
+                        estado: {
+                        id: null,
+                        nome: null
+                        }
+                    },
+                    nomeRazaoSocial: document.getElementById("tx_nome").value,
+                    cpf: document.getElementById("tx_cpf").value,
+                    cnpj: document.getElementById("tx_cpnj").value,
+                    telefone: document.getElementById("tx_telefone").value,
+                    endereco: document.getElementById("tx_endereco").value,
+                    bairro: document.getElementById("tx_bairro").value,
+                    cep: document.getElementById("tx_cep").value,
+                    email: document.getElementById("tx_email").value,
+                    ativo: document.getElementById("bo_ativo").checked,
+                    informacoes: document.getElementById("tx_informacoes").value
+                    }
+            ));
+        }
+
+        function alterarCliente(){
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function(){
+                if(this.readyState == 4 && this.status == 200){
+                    alert("Cliente Alterado!");
+                    return listarClientes();
+                }
+            }
+            xhttp.open("PUT", "/cliente/" + document.getElementById("tx_id").value);
+            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhttp.send(JSON.stringify(
+                {
+                    id: document.getElementById("tx_id").value,
+                    municipio: {
+                        id: document.getElementById("tx_id_munic").value,
+                        nome: null,
+                        entrega: null,
+                        estado: {
+                        id: null,
+                        nome: null
+                        }
+                    },
+                    nomeRazaoSocial: document.getElementById("tx_nome").value,
+                    cpf: document.getElementById("tx_cpf").value,
+                    cnpj: document.getElementById("tx_cpnj").value,
+                    telefone: document.getElementById("tx_telefone").value,
+                    endereco: document.getElementById("tx_endereco").value,
+                    bairro: document.getElementById("tx_bairro").value,
+                    cep: document.getElementById("tx_cep").value,
+                    email: document.getElementById("tx_email").value,
+                    ativo: document.getElementById("bo_ativo").checked,
+                    informacoes: document.getElementById("tx_informacoes").value
+                    }
+            ));
+        }
+    </script>
+</body>
+</html>
