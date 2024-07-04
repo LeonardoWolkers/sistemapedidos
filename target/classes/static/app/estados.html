@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estados</title>
-    <link rel="stylesheet" href="/app/dist/css/estilo.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-    <div class="div" style="padding-left: 10px;">
+    <!-- <div class="div" style="padding-left: 10px;">
         <form style="text-align: right;">
             <label>ID</label><input type="text" disabled readonly id="tx_id"/>
             <label>Nome</label><input type="text" id="tx_nome"/>
@@ -16,85 +16,143 @@
             <button type="button" onclick=alterarEstado()>Alterar</button>
         </form>
     </div>
+        <h1>Estados</h1> -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Estados</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/?">Principal</a>
+                </li>
+                <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Listagens
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" target="_blank"  href="/app/produtos.html">Produtos</a></li>
+                    <li><a class="dropdown-item" target="_blank" href="/app/municipios.html">Municipios</a></li>
+                    <li><a class="dropdown-item" target="_blank" href="/app/clientes.html">Clientes</a></li>
+                </ul>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link disabled" aria-disabled="true">Em breve</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" disabled type="search" placeholder="Em breve" aria-label="Search">
+                <button class="btn btn-outline-light" disabled type="submit">Buscar</button>
+            </form>
+            </div>
+        </div>
+    </nav>
 
+    <div class="container mt-5">
+        <div class="form-floating mb-3">
+            <input id="tx_id" type="number" disabled class="form-control" placeholder="">
+            <label for="floatingInput">ID</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input id="tx_nome" type="text" class="form-control" placeholder="">
+            <label for="floatingInput">Nome</label>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic outlined example">
+            <button type="button" class="btn btn-outline-primary" onclick=limparCampos()>Limpar</button>
+            <button type="button" class="btn btn-outline-primary" onclick=listarEstados()>Listar</button>
+            <button type="button" class="btn btn-outline-primary" onclick=criarEstado()>Criar</button>
+            <button type="button" class="btn btn-outline-primary" onclick=alterarEstado()>Alterar</button>
+        </div>
 
+    </div>
 
+    <div id="Listagem"></div>
 
-        <h1>Estados</h1>
-        <div id="Listagem"></div>
-
-
-    <script>
-        function criarEstado(){
-            var xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    alert("Estado criado!");
-                    return listarEstados();
-                } 
-            }
-            xhttp.open("POST", "/estado");
-            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhttp.send(JSON.stringify({id: null, nome: document.getElementById("tx_nome").value}));
-        }
-
-        function alterarEstado(){
-            var xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    alert("Estado Alterado!");
-                    return listarEstados();
-                }
-            }
-            xhttp.open("PUT", "/estado/" + document.getElementById("tx_id").value);
-            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhttp.send(JSON.stringify({id: document.getElementById("tx_id").value, nome: document.getElementById("tx_nome").value}));
-        }
-
-        function listarEstados(){
-            var xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function(){  
-                if(this.readyState == 4 && this.status == 200){
-                    var json = JSON.parse(this.responseText);
-                    var cont  = "";
-                        cont += "<table border='2'>"
-                        cont += "<tr><th>ID</th> <th>Nome</th> <th>Ações</th></tr> ";
-                    for(var estado of json){
-                        cont += "<tr>";
-                        cont += "<td>"+ estado.id + "</td> <td>"+ estado.nome + "</td>";
-                        cont += "<td>  <button style='margin-right: 2px;' type='button' onclick=\"preencherEstado('" + estado.id + "','" + estado.nome + "')\">Selecionar</button>";
-                        cont += "<button type='button' onclick='excluirEstado(" + estado.id + ")'>Excluir</button></td>";
-                        cont += "</tr>";
-                    }
-                    cont += "</table>";
-                    document.getElementById("Listagem").innerHTML = cont;
-                }
-            };
-            xhttp.open("GET", "/estados");
-            xhttp.send();
-        }
-
-        function preencherEstado(idEstado, nomeEstado){
-            document.getElementById("tx_id").value   = idEstado;
-            document.getElementById("tx_nome").value = nomeEstado;
-        }
-
-        function excluirEstado(idEstado){
-            var xhttp = new XMLHttpRequest();
-
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    alert("Estado Excluído!");
-                    return listarEstados();
-                }
-            }
-            xhttp.open("DELETE", "/estado/" + idEstado);
-            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhttp.send();
-        }
-    </script>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>    
+<script>
+    function listarEstados(){
+        var xhttp = new XMLHttpRequest();
+        
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                var json = JSON.parse(this.responseText);
+                var row  = "";
+                    row += "<table class=\"table mt-5 container text-left table-striped\">";
+                    row += "<thead class=\"table-dark\"><tr><th scope=\"col\">ID</th><th scope=\"col\">Nome</th><th class=\"text-center\" scope=\"col\">Ações</th></tr></thead>";
+                    row += "<tbody>"
+                for(var estado of json){
+                    row += "<tr>"
+                    row += "<th scope=\"row\">" + estado.id + "</th><td>" + estado.nome + "</td>";
+                    row += "<td> <button class=\"btn btn-dark me-2\" type='button' onclick=\"preencherEstado('"+ estado.id + "','" + estado.nome + "')\">Selecionar</button>";
+                    row += "<button class=\"btn btn-dark\" type='button' onclick=excluirEstado('"+ estado.id +"')>Excluir</button></td>";
+                    row += "</tr>"
+                }
+                row += "</tbody></table>"
+                document.getElementById("Listagem").innerHTML = row;
+            }
+        };
+        xhttp.open("GET", "/estados");
+        xhttp.send();            
+    }
+        
+    function criarEstado(){
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                alert("Estado criado!");
+                return listarEstados();
+            } 
+        }
+        xhttp.open("POST", "/estado");
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify(
+            {
+                id: null, 
+                nome: document.getElementById("tx_nome").value
+            }
+        ));
+    }
+
+    function alterarEstado(){
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                alert("Estado Alterado!");
+                return listarEstados();
+            }
+        }
+        xhttp.open("PUT", "/estado/" + document.getElementById("tx_id").value);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify({id: document.getElementById("tx_id").value, nome: document.getElementById("tx_nome").value}));
+    }
+
+    function preencherEstado(idEstado, nomeEstado){
+        document.getElementById("tx_id").value   = idEstado;
+        document.getElementById("tx_nome").value = nomeEstado;
+    }
+
+    function excluirEstado(idEstado){
+        var xhttp = new XMLHttpRequest();
+
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                alert("Estado Excluído!");
+                return listarEstados();
+            }
+        }
+        xhttp.open("DELETE", "/estado/" + idEstado);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send();
+    }
+
+    function limparCampos(){
+        document.getElementById("tx_id").value   = null;
+        document.getElementById("tx_nome").value = null;
+    }
+</script>
 </html>
