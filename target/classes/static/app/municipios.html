@@ -49,9 +49,11 @@
             <input id="tx_nome" type="text" class="form-control" placeholder="">
             <label for="floatingInput">Nome</label>
         </div>
-        <div class="form-floating mb-3">
-            <input id="tx_id_estado" type="number" class="form-control" placeholder="">
-            <label for="floatingInput">ID Estado</label>
+        <div class="form-floating mb-2">
+            <select class="form-select" id="id_estado" aria-label="Floating label select example">
+                <option selected value="">Estados</option>
+            </select>
+            <label for="floatingSelect">Estados</label>
         </div>
         <div class="form-check form-switch ms-2 mb-2">
             <input class="form-check-input" type="checkbox" role="switch" id="bo_entrega" checked>
@@ -66,106 +68,144 @@
     </div>
     
     <div id="Listagem"></div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script>
-            function listarMunicipios(){
-            var xhttp = new XMLHttpRequest();
-            
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    var json = JSON.parse(this.responseText);
-                    var row  = "";
-                        row += "<table class=\"table mt-5 container text-left table-striped\">";
-                        row += "<thead class=\"table-dark\"><tr><th scope=\"col\">ID</th><th scope=\"col\">Nome</th><th scope=\"col\">Entrega</th><th scope=\"col\">ID Estado</th><th scope=\"col\">Nome Estado</th><th class=\"text-center g-col-1\" scope=\"col\">Ações</th></tr></thead>";
-                        row += "<tbody>"
-                    for(var munic of json){
-                        row += "<tr>"
-                        row += "<th scope=\"row\">" + munic.id + "</th><td>" + munic.nome + "</td><td>" + munic.entrega + "</td><td>" + munic.estado.id + "</td><td>" + munic.estado.nome + "</td>";
-                        row += "<td> <button class=\"btn btn-dark me-2\" type='button' onclick=\"preencherMunicipio('"+ munic.id +"','" + munic.nome + "','" + munic.estado.id + "')\">Selecionar</button>";
-                        row += "<button class=\"btn btn-dark\" type='button' onclick=excluirMunicipio('"+ munic.id +"')>Excluir</button></td>";
-                        row += "</tr>"
-                    }
-                    row += "</tbody></table>"
-                    document.getElementById("Listagem").innerHTML = row;
+</body>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script>
+        function listarMunicipios(){
+        var xhttp = new XMLHttpRequest();
+        
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                var json = JSON.parse(this.responseText);
+                var row  = "";
+                    row += "<table class=\"table mt-5 container text-left table-striped table-rounded\">";
+                    row += "<thead class=\"table-dark\"><tr><th scope=\"col\" class=\"col-1\">ID</th><th scope=\"col\" class=\"col-3\">Nome</th><th scope=\"col\" class=\"col-1\">Entrega</th><th scope=\"col\" class=\"col-3\">Estado</th><th class=\"text-center col-2\" scope=\"col\">Ações</th></tr></thead>";
+                    row += "<tbody>"
+                for(var munic of json){
+                    row += "<tr>"
+                    row += "<th scope=\"row\ class=\"col-1\">" + munic.id + "</th><td class=\"col-3\">" + munic.nome + "</td><td class=\"col-1\">" + (munic.entrega ? "Sim" : "Não") + "</td><td class=\"col-3\">" + munic.estado.nome + "</td>";
+                    row += "<td class=\"text-center col-2\" > <button class=\"btn btn-dark me-2\" type='button' onclick=\"preencherMunicipio('"+ munic.id +"','" + munic.nome + "','" + munic.estado.id + "')\">Selecionar</button>";
+                    row += "<button class=\"btn btn-dark\" type='button' onclick=excluirMunicipio('"+ munic.id +"')>Excluir</button></td>";
+                    row += "</tr>"
                 }
-            };
-            xhttp.open("GET", "/municipios");
-            xhttp.send();            
-        }
+                row += "</tbody></table>"
+                document.getElementById("Listagem").innerHTML = row;
+            }
+        };
+        xhttp.open("GET", "/municipios");
+        xhttp.send();            
+    }
 
-        function preencherMunicipio(idMunicipio, nomeMunicipio, idEstado){
-            document.getElementById("tx_id").value        = idMunicipio;
-            document.getElementById("tx_nome").value      = nomeMunicipio;
-            document.getElementById("tx_id_estado").value = idEstado
-        }
+    function preencherMunicipio(idMunicipio, nomeMunicipio, idEstado){
+        document.getElementById("tx_id").value        = idMunicipio;
+        document.getElementById("tx_nome").value      = nomeMunicipio;
+        document.getElementById("id_estado").value    = idEstado
+    }
 
-        function excluirMunicipio(idMunicipio){
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    alert("Municipio excluído!");
-                    return listarMunicipios();
+    function excluirMunicipio(idMunicipio){
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                alert("Municipio excluído!");
+                return listarMunicipios();
+            }
+        }
+        xhttp.open("DELETE", "/municipio/" + idMunicipio);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send();
+    }
+
+    function criarMunicipio(){
+        var temp = document.getElementById("id_estado").value;
+        if(temp === "" || temp === null){
+            alert("Estado deve ser preenchido.");
+            return;
+        }
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                alert("Municipio criado!");
+                return listarMunicipios();
+            }
+        }
+        xhttp.open("POST", "/municipio");
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify(
+            {
+                id: null,
+                nome: document.getElementById("tx_nome").value,
+                entrega: document.getElementById("bo_entrega").checked,
+                estado: {
+                    id: document.getElementById("id_estado").value,
+                    nome: null
                 }
             }
-            xhttp.open("DELETE", "/municipio/" + idMunicipio);
-            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhttp.send();
-        }
-
-        function criarMunicipio(){
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    alert("Municipio criado!");
-                    return listarMunicipios();
-                }
-            }
-            xhttp.open("POST", "/municipio");
-            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhttp.send(JSON.stringify(
-                {
-                    id: null,
-                    nome: document.getElementById("tx_nome").value,
-                    entrega: document.getElementById("bo_entrega").checked,
-                    estado: {
-                        id: document.getElementById("tx_id_estado").value,
-                        nome: null
-                    }
-                }
-                ));
-            }
-
-        function limparCampos(){
-            document.getElementById("tx_id").value             = null;
-            document.getElementById("tx_nome").value           = null;
-            document.getElementById("tx_id_estado").value      = null;
-            document.getElementById("bo_entrega").checked      = false
-            alert("Campos Limpos!");
-        }
-
-        function alterarMunicipio(){
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function(){
-                if(this.readyState == 4 && this.status == 200){
-                    alert("Municipio Alterado!");
-                    return listarMunicipios();
-                }
-            }
-            xhttp.open("PUT", "/municipio/" + document.getElementById("tx_id").value);
-            xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhttp.send(JSON.stringify(
-                {
-                    id: document.getElementById("tx_id").value,
-                    nome: document.getElementById("tx_nome").value,
-                    entrega: document.getElementById("bo_entrega").checked,
-                    estado: {
-                        id: document.getElementById("tx_id_estado").value,
-                        nome: null
-                    }
-                }
             ));
         }
-    </script>
-</body>
+
+    function limparCampos(){
+        document.getElementById("tx_id").value             = null;
+        document.getElementById("tx_nome").value           = null;
+        document.getElementById("id_estado").value         = '';
+        document.getElementById("bo_entrega").checked      = false
+        alert("Campos Limpos!");
+    }
+
+    function alterarMunicipio(){
+        var temp = document.getElementById("id_estado").value;
+        if(temp === "" || temp === null){
+            alert("Estado deve ser preenchido.");
+            return;
+        }
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                alert("Municipio Alterado!");
+                return listarMunicipios();
+            }
+        }
+        xhttp.open("PUT", "/municipio/" + document.getElementById("tx_id").value);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify(
+            {
+                id: document.getElementById("tx_id").value,
+                nome: document.getElementById("tx_nome").value,
+                entrega: document.getElementById("bo_entrega").checked,
+                estado: {
+                    id: document.getElementById("id_estado").value,
+                    nome: null
+                }
+            }
+        ));
+    }
+
+    function listarEstados(){
+    var xhttp = new XMLHttpRequest();
+    
+    xhttp.onreadystatechange = function(){
+        if(this.readyState == 4 && this.status == 200){
+            var json = JSON.parse(this.responseText);
+            var row  = "<option value=''>Estados</option>";
+            for(var estado of json){
+                row += "<option value=\"" + estado.id + "\">"+ estado.nome + "</option>";
+            }
+            //document.getElementById("floatingSelect").innerHTML = row;
+            // Salva o valor selecionado
+            var selectElement = document.getElementById("id_estado");
+            var selectedValue = selectElement.value;
+
+            // Atualiza o conteúdo do select
+            selectElement.innerHTML = row;
+
+            // Restaura a seleção
+            selectElement.value = selectedValue;
+        }
+    };
+    xhttp.open("GET", "/estados");
+    xhttp.send();            
+}
+
+document.addEventListener("DOMContentLoaded", function() {listarEstados();});
+</script>
 </html>

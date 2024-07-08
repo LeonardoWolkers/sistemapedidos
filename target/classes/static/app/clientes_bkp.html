@@ -62,14 +62,13 @@
         </div>
     </nav>
 
-    <div class="container col-10 d-flex" >
-        <div class="mt-5 col-5">
+    <div class="container mt-5">
             <div class="form-floating mb-3">
                 <input id="tx_id" type="number" disabled class="form-control" placeholder="">
                 <label for="floatingInput">ID</label>
             </div>
             <div class="form-floating mb-3">
-                <input id="tx_nome" type="text" class="form-control" placeholder="" >
+                <input id="tx_nome" type="text" class="form-control" placeholder="">
                 <label for="floatingInput">Razão Social</label>
             </div>
             <div class="form-floating mb-3">
@@ -84,9 +83,7 @@
                 <input id="tx_cpnj" type="text" class="form-control" placeholder="">
                 <label for="floatingInput">CNPJ</label>
             </div>
-        </div>
-        <div class="mt-5 col-2"></div>
-        <div class="mt-5 col-5">
+
             <div class="form-floating mb-3">
                 <input id="tx_telefone" type="text" class="form-control" placeholder="">
                 <label for="floatingInput">Telefone</label>
@@ -107,10 +104,7 @@
                 <input id="tx_email" type="text" class="form-control" placeholder="">
                 <label for="floatingInput">Email</label>
             </div>   
-        </div>
-    </div>
 
-    <div class="container col-10">
         <div class="form-floating mb-3">
             <input id="tx_informacoes" type="text" class="form-control" placeholder="">
             <label for="floatingInput">Informações</label>
@@ -127,8 +121,8 @@
             <button type="button" class="btn btn-outline-primary" onclick=criarCliente()>Criar</button>
             <button type="button" class="btn btn-outline-primary" onclick=alterarCliente()>Alterar</button>
         </div>
-    </div>
 
+    </div>
 
     <div id="Listagem"></div>
 
@@ -136,7 +130,7 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
-    function listarClientes2(){
+    function listarClientes(){
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function(){
             if(this.readyState == 4 && this.status == 200){
@@ -154,30 +148,6 @@
                     row += "</tr>"; // Fim table row
                 }
                 row += "</table>";// Fim Table
-                document.getElementById("Listagem").innerHTML = row;
-            }
-        }
-        xhttp.open("GET", "/clientes");
-        xhttp.send();         
-    }
-
-    function listarClientes(){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function(){
-            if(this.readyState == 4 && this.status == 200){
-                var json = JSON.parse(this.responseText);
-                var row  = "";
-                    row += "<table class=\"table mt-5 container text-left table-striped table-hover\">";
-                    row += "<thead class=\"table-dark\"><tr><th scope=\"col\">ID</th><th scope=\"col\">Nome</th><th scope=\"col\">ID</th><th scope=\"col\">Municipio</th><th scope=\"col\">CPF</th><th scope=\"col\">CNPJ</th><th scope=\"col\">Telefone</th><th scope=\"col\">Endereço</th><th scope=\"col\">Bairro</th><th scope=\"col\">CEP</th><th scope=\"col\">Email</th><th scope=\"col\">Ativo</th><th scope=\"col\">Informações</th><th scope=\"col\">Ações</th></tr></thead>";
-                    row += "<tbody>"
-                for(var cliente of json){
-                    row += "<tr>"
-                    row += "<th scope=\"row\">" + cliente.id + "</th><td>" + cliente.nomeRazaoSocial + "</td><td>" + cliente.municipio.id + "</td><td>" + cliente.municipio.nome + "</td><td>" + cliente.cpf + "</td><td>" + cliente.cnpj + "</td><td>" + cliente.telefone + "</td><td>" + cliente.endereco + "</td><td>" + cliente.bairro + "</td><td>" + cliente.cep + "</td><td>" + cliente.email + "</td><td>" + cliente.ativo + "</td><td>" + cliente.informacoes + "</td>";
-                    row += "<td> <button class=\"btn btn-dark me-2\" type='button' onclick=\"preencherCliente('"+ cliente.id +"','" + cliente.nomeRazaoSocial + "','" + cliente.municipio.id + "','" + cliente.cpf + "','" + cliente.cnpj + "','" + cliente.telefone + "','" + cliente.endereco + "','" + cliente.bairro + "','" + cliente.cep + "','" + cliente.email + "','" + cliente.informacoes + "','" + cliente.ativo + "')\">Selecionar</button>";
-                    row += "<button class=\"btn btn-dark\" type='button' onclick=excluirCliente('"+ cliente.id +"')>Excluir</button></td>";
-                    row += "</tr>"
-                }
-                row += "</tbody></table>"
                 document.getElementById("Listagem").innerHTML = row;
             }
         }
